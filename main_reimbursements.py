@@ -5,35 +5,45 @@ import justpy as jp
 
 def main():
     wp = jp.WebPage(delete_flag=False)
-    button_classes = "w-32 h-10 bg-green-500 m-2 hover:bg-green-700 text-white font-bold py-2" \
-                     " px-4 rounded text-center"
+    button_classes = "block w-32 h-10 bg-green-700 hover:bg-green-800 text-white font-bold py-2" \
+                     "px-4 rounded m-5"
     div_classes = "flex m-4 flex-wrap"
     p_classes = "m-2 p-2 h-10 text-xl"
 
-    banner = jp.Div(text='Five Oaks Church', a=wp, classes='block uppercase w-full h-1000 bg-blue place-items-top '
-                                                           'font-bold text-xs text-white align-left')
+    banner_div = jp.Div(text='Five Oaks Church', a=wp, classes='block uppercase w-full place-items-center '
+                                                  'font-bold text-xs text-white align-left overflow-hidden',
+           style='background:#047857; height:75px; font-size:30px; padding: 10px; border-style: solid;'
+                 'border-bottom-color: #065f46; border-bottom-width: 10px')
+    title_div = jp.Div(text='Ministry Add and Edit', a=wp,
+                       classes='text-center font-bold border m-5 mx-60 p-4 w-25 overflow-hidden')
+    description_div = jp.Div(text='Create or Edit Ministry Data', a=title_div,
+                             classes='text-center text-xs overflow-hidden')
 
     # basic form (input and action)
     def input_form():
-        form_div = jp.Div(a=wp, classes='grid h-screen place-items-center')
-        form1 = jp.Form(a=form_div, classes='flex flex-col border m-5 p-4 w-100')
-        input_div = jp.Div(a=form1, classes='py-1 pl-8')
-        button_div = jp.Div(a=form1, classes='py-3')
+        # div definitions
+        form_div = jp.Div(a=wp, classes='grid h-50')
+        form1 = jp.Form(a=form_div, classes='border m-5 p-4 w-100')
+        input_div = jp.Div(a=form1, classes='flex flex-col items-center py-1')
+        button_div = jp.Div(a=form1, classes='flex flex-col items-center py-3')
+        button_div2 = jp.Div(a=button_div, classes='flex flex-row items-center py-3')
 
         # form entry template
         minID_label = jp.Label(text='MinistryID',
-                               classes='block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2 mt-2',
+                               classes='grid uppercase tracking-wide text-gray-700 text-xs font-bold',
                                a=input_div)
         in1 = jp.Input(placeholder='MinistryID', a=input_div, classes='form-input', type='number')
         minID_label.for_component = in1
         # form entry template
 
         ministry_label = jp.Label(text='Ministry',
-                                  classes='block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2 mt-2',
+                                  classes='grid uppercase tracking-wide text-gray-700 text-xs font-bold '
+                                          'mb-2 mt-2',
                                   a=input_div)
         in2 = jp.Input(placeholder='Ministry', a=input_div, classes='form-input', type='text')
         ministry_label.for_component = in2
 
+        # retrieve contents of database
         def contents_show(self, msg):
             conn = sqlite3.connect('db_reimbursements.db')
             cur = conn.cursor()
@@ -44,10 +54,13 @@ def main():
             conn.commit()
             conn.close()
 
-        submit_button = jp.Input(value='Submit Form', type='submit', a=button_div, classes=button_classes)
-        show_button = jp.Button(text='Show Values', type='button', a=button_div, classes=button_classes,
+        # buttons for submitting and retrieving data
+        submit_button = jp.Input(value='Submit Form', type='submit', a=button_div2, classes=button_classes,
+                                 style='cursor: pointer')
+        show_button = jp.Button(text='Show Values', type='button', a=button_div2, classes=button_classes,
                                 click=contents_show)
 
+        # function for inserting and committing data
         def submit_form(self, msg):
             min_id = 0
             desc = ''
