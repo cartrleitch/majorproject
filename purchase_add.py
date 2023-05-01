@@ -1,7 +1,7 @@
 import sqlite3
 import sys
 import justpy as jp
-import reusables as re
+from cosmetic_classes import *
 
 
 @jp.SetRoute('/addpurchase')
@@ -10,30 +10,15 @@ def add_purchase_main():
     wp = jp.WebPage(delete_flag=False)
     wp.title = 'Add Purchase'
 
-    # classes for design elements
-    button_classes = "block w-32 h-10 bg-green-700 hover:bg-green-800 text-white font-bold py-2" \
-                     "px-4 rounded m-5"
-    label_classes = "grid uppercase tracking-wide text-gray-700 text-xs font-bold" \
-                    "mb-2 mt-2"
-    input_classes = 'form-input'
-
-    # banner at top of page
-    def banner_click(self, msg):
-        msg.page.redirect = 'http://127.0.0.1:8000/reimbursementtable'
-
-    banner_div = jp.Div(text='Five Oaks Church', a=wp, classes='block uppercase w-full place-items-center '
-                                                               'font-bold text-xs text-white '
-                                                               'align-left overflow-hidden',
-                        style='background:#047857; height:75px; font-size:30px; padding: 10px; border-style: solid;'
-                              'border-bottom-color: #065f46; border-bottom-width: 10px; cursor: pointer;',
+    banner_div = jp.Div(text='Five Oaks Church', a=wp, classes=banner_classes,
+                        style=banner_style,
                         click=banner_click)
-    banner_sub = jp.Div(text='Reimbursement Manager', a=banner_div, classes='block uppercase w-full place-items-center '
-                                                                            'italic text-xs text-white',
+    banner_sub = jp.Div(text='Reimbursement Manager', a=banner_div, classes=banner_sub_classes,
                         style='font-size:15px; padding-top: 10px;')
     title_div = jp.Div(text='Purchase Add and Edit', a=wp,
-                       classes='text-center font-bold border m-5 mx-60 p-4 w-25 overflow-hidden')
+                       classes=title_classes)
     description_div = jp.Div(text='Create or Edit Purchase Data', a=title_div,
-                             classes='text-center text-xs overflow-hidden')
+                             classes=desc_classes)
 
     # page divs
     form_div = jp.Div(a=wp, classes='grid h-50')
@@ -65,42 +50,49 @@ def add_purchase_main():
     contents_label.for_component = contents_in
 
     # button that calls submit_form when pressed
-    submit_button = jp.Input(value='Save', type='submit', a=button_div2, classes=button_classes,
-                             style='cursor: pointer')
+    save_button = jp.Input(value='Save', type='submit', a=button_div2, classes=button_classes,
+                           style='cursor: pointer')
 
-    # inserts values from entries into table
-    def submit_form(self, msg):
-        data = msg.form_data
-        date = ''
-        total_cost = ''
-        p_type = ''
-        contents = ''
-
-        for output in data:
-            if output['id'] == '2':
-                date = output.value
-
-            if output['id'] == '3':
-                total_cost = float(output.value)
-
-            if output['id'] == '4':
-                p_type = output.value
-
-            if output['id'] == '5':
-                contents = output.value
-
-        conn = sqlite3.connect('db_reimbursements.db')
-        cur = conn.cursor()
-        cur.execute('INSERT INTO Purchase(PurchaseDate, Amount, Content, PurchaseType, ReimID) '
-                    'VALUES (?, ?, ?, ?, 1)', (date, total_cost, p_type, contents))
-        conn.commit()
-        conn.close()
+    # done button
+    done_button = jp.Button(text='Done', type='button', a=button_div2, classes=button_classes,
+                            click=done_red)
 
     form1.on('submit', submit_form)
-
-
     # creates webpage
     return wp
+
+
+def done_red(self, msg):
+    msg.page.redirect = 'http://127.0.0.1:8000/purchasetable'
+
+
+# inserts values from entries into table
+def submit_form(self, msg):
+    data = msg.form_data
+    date = ''
+    total_cost = ''
+    p_type = ''
+    contents = ''
+    print(data)
+    for output in data:
+        if output['placeholder'] == 'Date':
+            date = output.value
+
+        if output['placeholder'] == 'Total Cost':
+            total_cost = float(output.value)
+
+        if output['html_tag'] == 'select':
+            p_type = output.value
+
+        if output['placeholder'] == 'Contents':
+            contents = output.value
+
+    conn = sqlite3.connect('db_reimbursements.db')
+    cur = conn.cursor()
+    cur.execute('INSERT INTO Purchase(PurchaseDate, Amount, Content, PurchaseType, ReimID) '
+                'VALUES (?, ?, ?, ?, 1)', (date, total_cost, p_type, contents))
+    conn.commit()
+    conn.close()
 
 
 if __name__ == '__main__':

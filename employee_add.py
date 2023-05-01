@@ -1,38 +1,24 @@
 import sqlite3
 import sys
 import justpy as jp
-import reusables as re
+from cosmetic_classes import *
 
 
-def main():
+@jp.SetRoute('/addemployee')
+def add_emp_main():
     # webpage creation
     wp = jp.WebPage(delete_flag=False)
     wp.title = 'Add Employee'
 
-    # classes for design elements
-    button_classes = "block w-32 h-10 bg-green-700 hover:bg-green-800 text-white font-bold py-2" \
-                     "px-4 rounded m-5"
-    label_classes = "grid uppercase tracking-wide text-gray-700 text-xs font-bold" \
-                    "mb-2 mt-2"
-    input_classes = 'form-input'
-
-    # banner at top of page
-    def banner_click(self, msg):
-        msg.page.redirect = 'http://127.0.0.1:8000/reimbursementtable'
-
-    banner_div = jp.Div(text='Five Oaks Church', a=wp, classes='block uppercase w-full place-items-center '
-                                                               'font-bold text-xs text-white '
-                                                               'align-left overflow-hidden',
-                        style='background:#047857; height:75px; font-size:30px; padding: 10px; border-style: solid;'
-                              'border-bottom-color: #065f46; border-bottom-width: 10px; cursor: pointer;',
+    banner_div = jp.Div(text='Five Oaks Church', a=wp, classes=banner_classes,
+                        style=banner_style,
                         click=banner_click)
-    banner_sub = jp.Div(text='Reimbursement Manager', a=banner_div, classes='block uppercase w-full place-items-center '
-                                                                            'italic text-xs text-white',
+    banner_sub = jp.Div(text='Reimbursement Manager', a=banner_div, classes=banner_sub_classes,
                         style='font-size:15px; padding-top: 10px;')
     title_div = jp.Div(text='Employee Add and Edit', a=wp,
-                       classes='text-center font-bold border m-5 mx-60 p-4 w-25 overflow-hidden')
+                       classes=title_classes)
     description_div = jp.Div(text='Create or Edit Employee Data', a=title_div,
-                             classes='text-center text-xs overflow-hidden')
+                             classes=desc_classes)
 
     # page divs
     form_div = jp.Div(a=wp, classes='grid h-50')
@@ -89,69 +75,75 @@ def main():
         select.add(jp.Option(value=ministry, text=ministry))
     ministry_label.for_component = select
 
-
     # button that calls submit_form when pressed
-    submit_button = jp.Input(value='Save', type='submit', a=button_div2, classes=button_classes,
-                             style='cursor: pointer')
+    save_button = jp.Input(value='Save', type='submit', a=button_div2, classes=button_classes,
+                           style='cursor: pointer')
 
-    # inserts values from entries into table
-    def submit_form(self, msg):
-        data = msg.form_data
-        first_name = ''
-        last_name = ''
-        street = ''
-        city = ''
-        state = ''
-        zip_code = ''
-        job_title = ''
-        emp_account = ''
-        minis = ''
-
-        for output in data:
-            if output['id'] == '2':
-                first_name = output.value
-
-            if output['id'] == '3':
-                last_name = float(output.value)
-
-            if output['id'] == '4':
-                street = output.value
-
-            if output['id'] == '5':
-                city = output.value
-
-            if output['id'] == '6':
-                state = output.value
-
-            if output['id'] == '7':
-                zip_code = output.value
-
-            if output['id'] == '8':
-                job_title = output.value
-
-            if output['id'] == '9':
-                emp_account = output.value
-
-            if output['id'] == '10':
-                minis = output.value
-
-        conn = sqlite3.connect('db_reimbursements.db')
-        cur = conn.cursor()
-        cur.execute('INSERT INTO Employee(FirstName, LastName, Street, City, State, ZipCode, '
-                    'JobTitle, EmpAccount) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', (first_name, last_name, street, city,
-                                                                                state, zip_code, job_title,
-                                                                                emp_account))
-        # needs corresponding IDs and date to input
-        cur.execute("INSERT INTO EmpMinistry VALUES (1, 1, '12-12-2023', '12-12-2023')")
-        conn.commit()
-        conn.close()
+    done_button = jp.Button(text='Done', type='button', a=button_div2, classes=button_classes,
+                            click=done_red)
 
     form1.on('submit', submit_form)
-
-
     # creates webpage
     return wp
 
 
+def done_red(self, msg):
+    msg.page.redirect = 'http://127.0.0.1:8000/employeetable'
+
+
+# inserts values from entries into table
+def submit_form(self, msg):
+    data = msg.form_data
+    first_name = ''
+    last_name = ''
+    street = ''
+    city = ''
+    state = ''
+    zip_code = ''
+    job_title = ''
+    emp_account = ''
+    minis = ''
+
+    # assigns variables values from entries
+    for output in data:
+        if output['placeholder'] == 'First Name':
+            first_name = output.value
+
+        if output['placeholder'] == 'Last Name':
+            last_name = output.value
+
+        if output['placeholder'] == 'Street':
+            street = output.value
+
+        if output['placeholder'] == 'City':
+            city = output.value
+
+        if output['placeholder'] == 'State':
+            state = output.value
+
+        if output['placeholder'] == 'Zip Code':
+            zip_code = output.value
+
+        if output['placeholder'] == 'Job Title':
+            job_title = output.value
+
+        if output['placeholder'] == 'Employee Account':
+            emp_account = output.value
+
+        if output['id'] == '24':
+            minis = output.value
+
+    conn = sqlite3.connect('db_reimbursements.db')
+    cur = conn.cursor()
+    cur.execute('INSERT INTO Employee(FirstName, LastName, Street, City, State, ZipCode, '
+                'JobTitle, EmpAccount) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', (first_name, last_name, street, city,
+                                                                          state, zip_code, job_title,
+                                                                          emp_account))
+    # needs corresponding IDs and date to input
+    # cur.execute("INSERT INTO EmpMinistry (StartDate, EndDate) VALUES ('12-12-2023', '12-12-2023')")
+    conn.commit()
+    conn.close()
+
+
 if __name__ == '__main__':
-    main()
+    add_emp_main()
