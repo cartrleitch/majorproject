@@ -3,8 +3,11 @@ import sys
 import justpy as jp
 import pandas as pd
 from cosmetic_classes import *
+
 global reim_sel_data
 reim_sel_data = ''
+global pur_sel_data
+pur_sel_data = ''
 
 conn = sqlite3.connect('db_reimbursements.db')
 
@@ -42,37 +45,59 @@ def reim_table():
                         style='font-size:15px; padding-top: 10px;')
 
     # divs
-    table_div = jp.Div(a=wp, classes='flex flex-col items-center pt-5')
+    m_table_div = jp.Div(a=wp, classes='flex flex-col items-center py-3')
+    r_table_div = jp.Div(a=m_table_div)
+    table_div = jp.Div(a=r_table_div, classes='flex flex-row items-center pt-5', style='display:inline-block;')
+    table_div2 = jp.Div(a=r_table_div, classes='flex flex-row items-center pt-5', style='display:inline-block;')
     button_div = jp.Div(a=wp, classes='flex flex-col items-center py-3')
-    button_div2 = jp.Div(a=button_div, classes='flex flex-row items-center overflow-hidden')
-    button_div3 = jp.Div(a=button_div, classes='flex flex-row items-center overflow-hidden')
+    button_div2 = jp.Div(a=button_div, classes='flex flex-row items-center',)
+    button_div3 = jp.Div(a=button_div, classes='flex flex-row items-center')
     data_div = jp.Div(a=table_div, style='display:none;')
+    data_div2 = jp.Div(a=table_div, style="display:none")
 
     # table label
     table_label = jp.Div(a=table_div, text='Reimbursement Table', classes=table_title_classes)
     table_label.for_component = table_div
 
     # creates table
-    grid = reim_table_data.jp.ag_grid(a=table_div,
-                                      style="height: 50vh; width: 50vw; margin: 0.25rem; padding: 0.25rem;")
-    grid.row_data = data_div
-    grid.on('rowSelected', selected_row)
-    grid.options.columnDefs[0].hide = True
-    grid.options.columnDefs[1].checkboxSelection = True
+    grid_reim = reim_table_data.jp.ag_grid(a=table_div,
+                                           style="height: 50vh; width: 50vw; margin: 0.25rem; padding: 0.25rem;")
+    grid_reim.row_data = data_div
+    grid_reim.on('rowSelected', selected_row)
+    grid_reim.options.columnDefs[0].hide = True
+    grid_reim.options.columnDefs[1].checkboxSelection = True
 
-    # button that opens add reimbursement page
-    add_reimbursement_button = jp.Button(text='Add', type='button', a=button_div2, classes=button_classes,
-                                         click=add_reim_red)
+    # purchase table
+    conn = sqlite3.connect('db_reimbursements.db')
 
-    # button that opens purchase table
-    view_contents_button = jp.Button(text='View Contents', type='button', a=button_div2, classes=button_classes,
-                                     click=view_contents)
+    # gets data from query to show employee and reimbursement information
+    pur_table_data = pd.read_sql_query("SELECT PurchaseID, PurchaseDate AS 'Purchase Date', Amount, Content, "
+                                       "PurchaseType AS 'PurchaseType' FROM Purchase", conn)
+    conn.close()
 
-    # button that opens employees table
-    employees_button = jp.Button(text='Employees', type='button', a=button_div2, classes=button_classes,
-                                 click=employees)
+    # takes data from selected row
+    def pur_selected_row(self, msg):
+        if msg.selected:
+            self.row_data.text = msg.data
+            global pur_sel_data
+            pur_sel_data = self.row_data.text
+            self.row_selected = msg.rowIndex
+        elif self.row_selected == msg.rowIndex:
+            self.row_data.text = ''
 
-    # button
+    # table label
+    table_label = jp.Div(a=table_div2, text='Purchases Table', classes=table_title_classes)
+    table_label.for_component = table_div2
+
+    # creates table
+    grid_pur = pur_table_data.jp.ag_grid(a=table_div2,
+                                     style="height: 50vh; width: 40vw; margin: 0.25rem; padding: 0.25rem;")
+    grid_pur.row_data = data_div2
+    grid_pur.on('rowSelected', selected_row)
+    grid_pur.options.columnDefs[0].hide = True
+    grid_pur.options.columnDefs[1].checkboxSelection = True
+
+
     def refresh_table(self, msg):
         conn = sqlite3.connect('db_reimbursements.db')
 
@@ -84,31 +109,51 @@ def reim_table():
                                                  "Employee "
                                                  "INNER JOIN Reimbursements ON "
                                                  "Employee.EmpID = Reimbursements.EmpID;", conn)
-        grid.load_pandas_frame(refreshed_table_data)
-        grid.on('rowSelected', selected_row)
-        grid.row_data = data_div
-        grid.options.columnDefs[0].hide = True
-        grid.options.columnDefs[1].checkboxSelection = True
+        grid_reim.load_pandas_frame(refreshed_table_data)
+        grid_reim.on('rowSelected', selected_row)
+        grid_reim.row_data = data_div
+        grid_reim.options.columnDefs[0].hide = True
+        grid_reim.options.columnDefs[1].checkboxSelection = True
+
+        # gets data from query to show employee and reimbursement information
+        pur_refreshed_table_data = pd.read_sql_query(
+            "SELECT PurchaseID, PurchaseDate AS 'Purchase Date', Amount, Content, "
+            "PurchaseType AS 'PurchaseType' FROM Purchase", conn)
+        grid_pur.load_pandas_frame(pur_refreshed_table_data)
+        grid_pur.on('rowSelected', pur_selected_row)
+        grid_pur.row_data = data_div
+        grid_pur.options.columnDefs[0].hide = True
+        grid_pur.options.columnDefs[1].checkboxSelection = True
 
         conn.close()
 
     refresh_table('', '')
+    # button that opens add reimbursement page
+    add_reimbursement_button = jp.Button(text='Add Reimb.', type='button', a=button_div2, classes=button_classes,
+                                         click=add_reim_red)
 
-    refresh_table_button = jp.Button(text='Refresh', type='button', a=button_div3, classes=button_classes,
+    # button that opens employees table
+    employees_button = jp.Button(text='Employees', type='button', a=button_div2, classes=button_classes,
+                                 click=employees)
+
+    refresh_table_button = jp.Button(text='Refresh', type='button', a=button_div2, classes=button_classes,
                                      click=refresh_table)
 
-    delete_selected_button = jp.Button(text='Delete', type='button', a=button_div3, classes=button_classes,
-                                     click=delete_selected)
+    delete_selected_button = jp.Button(text='Delete Reimb.', type='button', a=button_div3, classes=button_classes,
+                                       click=delete_selected)
+
+    # button that opens add purchase page
+    add_purchase_button = jp.Button(text='Add Purchase', type='button', a=button_div3, classes=button_classes,
+                                    click=add_pur_red)
+
+    pur_delete_selected_button = jp.Button(text='Delete Purchase', type='button', a=button_div3, classes=button_classes,
+                                           click=pur_delete_selected)
 
     return wp
 
 
 def add_reim_red(self, msg):
     msg.page.redirect = 'http://127.0.0.1:8000/addreimbursement'
-
-
-def view_contents(self, msg):
-    msg.page.redirect = 'http://127.0.0.1:8000/purchasetable'
 
 
 def employees(self, msg):
@@ -121,5 +166,18 @@ def delete_selected(self, msg):
     reim_del = reim_sel_data['ReimID']
     cur.execute(f"DELETE FROM Reimbursements WHERE ReimID = {reim_del}")
     cur.execute(f"DELETE FROM Purchase WHERE ReimID = {reim_del}")
+    conn.commit()
+    conn.close()
+
+
+def add_pur_red(self, msg):
+    msg.page.redirect = 'http://127.0.0.1:8000/addpurchase'
+
+
+def pur_delete_selected(self, msg):
+    conn = sqlite3.connect('db_reimbursements.db')
+    cur = conn.cursor()
+    pur_del = pur_sel_data['PurchaseID']
+    cur.execute(f"DELETE FROM Purchase WHERE PurchaseID = {pur_del}")
     conn.commit()
     conn.close()
