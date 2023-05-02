@@ -80,7 +80,7 @@ def add_purchase_main():
 
 
 def done_red(self, msg):
-    msg.page.redirect = 'http://127.0.0.1:8000/purchasetable'
+    msg.page.redirect = 'http://127.0.0.1:8000/reimbursementtable'
 
 
 # inserts values from entries into table
