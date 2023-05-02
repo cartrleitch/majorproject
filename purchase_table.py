@@ -9,7 +9,7 @@ pur_sel_data = ''
 conn = sqlite3.connect('db_reimbursements.db')
 
 # gets data from query to show employee and reimbursement information
-reim_table_data = pd.read_sql_query("SELECT PurchaseID, PurchaseDate AS 'Purchase Date', Amount, Content, "
+pur_table_data = pd.read_sql_query("SELECT PurchaseID, PurchaseDate AS 'Purchase Date', Amount, Content, "
                                     "PurchaseType AS 'PurchaseType' FROM Purchase", conn)
 conn.close()
 
@@ -26,7 +26,7 @@ def selected_row(self, msg):
 
 
 @jp.SetRoute("/purchasetable")
-def reim_table():
+def pur_table():
     # creates webpage and titles it
     wp = jp.WebPage()
     wp.title = 'Purchase Table'
@@ -48,7 +48,7 @@ def reim_table():
     table_label.for_component = table_div
 
     # creates table
-    grid = reim_table_data.jp.ag_grid(a=table_div,
+    grid = pur_table_data.jp.ag_grid(a=table_div,
                                       style="height: 50vh; width: 40vw; margin: 0.25rem; padding: 0.25rem;")
     grid.row_data = data_div
     grid.on('rowSelected', selected_row)
@@ -73,21 +73,7 @@ def reim_table():
 
         conn.close()
 
-    def ref():
-        conn = sqlite3.connect('db_reimbursements.db')
-
-        # gets data from query to show employee and reimbursement information
-        refreshed_table_data = pd.read_sql_query("SELECT PurchaseID, PurchaseDate AS 'Purchase Date', Amount, Content, "
-                                                 "PurchaseType AS 'PurchaseType' FROM Purchase", conn)
-        grid.load_pandas_frame(refreshed_table_data)
-        grid.on('rowSelected', selected_row)
-        grid.row_data = data_div
-        grid.options.columnDefs[0].hide = True
-        grid.options.columnDefs[1].checkboxSelection = True
-
-        conn.close()
-
-    ref()
+    refresh_table('', '')
 
     refresh_table_button = jp.Button(text='Refresh', type='button', a=button_div2, classes=button_classes,
                                      click=refresh_table)

@@ -88,21 +88,7 @@ def reim_table():
 
         conn.close()
 
-    def ref():
-        conn = sqlite3.connect('db_reimbursements.db')
-
-        # gets data from query to show employee and reimbursement information
-        refreshed_table_data = pd.read_sql_query("SELECT EmpID, FirstName, LastName, Street, City, "
-                                                 "State, ZipCode, JobTitle, EmpAccount FROM Employee", conn)
-        grid.load_pandas_frame(refreshed_table_data)
-        grid.on('rowSelected', selected_row)
-        grid.row_data = data_div
-        grid.options.columnDefs[0].hide = True
-        grid.options.columnDefs[1].checkboxSelection = True
-
-        conn.close()
-
-    ref()
+    refresh_table('', '')
 
     refresh_table_button = jp.Button(text='Refresh', type='button', a=button_div2, classes=button_classes,
                                      click=refresh_table)

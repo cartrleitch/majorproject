@@ -2,6 +2,7 @@ import sqlite3
 import sys
 import justpy as jp
 from cosmetic_classes import *
+import time
 
 
 @jp.SetRoute('/addemployee')
@@ -78,6 +79,22 @@ def add_emp_main():
     # button that calls submit_form when pressed
     save_button = jp.Input(value='Save', type='submit', a=button_div2, classes=button_classes,
                            style='cursor: pointer')
+    saved_div = jp.Div(text='Saved!', classes='flex flex-row items-center font-bold text-sm text-green-500 invisible',
+                       a=button_div)
+    saved_div.visibility_state = 'invisible'
+    save_button.saved_div = saved_div
+
+    def show_saved(self, msg):
+        self.saved_div.set_class('visible')
+        self.saved_div.visibility_state = 'visible'
+
+    def hide_saved(self, msg):
+        time.sleep(1)
+        self.saved_div.set_class('invisible')
+        self.saved_div.visibility_state = 'invisible'
+
+    save_button.on('click', show_saved)
+    save_button.on('mouseleave', hide_saved)
 
     done_button = jp.Button(text='Done', type='button', a=button_div2, classes=button_classes,
                             click=done_red)

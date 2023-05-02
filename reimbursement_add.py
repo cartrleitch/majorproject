@@ -74,7 +74,7 @@ def add_reim_main():
         self.saved_div.visibility_state = 'invisible'
 
     save_button.on('click', show_saved)
-
+    save_button.on('mouseleave', hide_saved)
 
     # return then call
     # button for adding purchase

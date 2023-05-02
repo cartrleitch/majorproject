@@ -92,26 +92,7 @@ def reim_table():
 
         conn.close()
 
-    def ref():
-        conn = sqlite3.connect('db_reimbursements.db')
-
-        # gets data from query to show employee and reimbursement information
-        refreshed_table_data = pd.read_sql_query("SELECT Reimbursements.ReimID, Employee.FirstName AS 'First Name', "
-                                                 "Employee.LastName AS 'Last Name', "
-                                                 "Reimbursements.DatePaid, "
-                                                 "Reimbursements.DateRec AS 'Date Received', Reimbursements.Total FROM "
-                                                 "Employee "
-                                                 "INNER JOIN Reimbursements ON "
-                                                 "Employee.EmpID = Reimbursements.EmpID;", conn)
-        grid.load_pandas_frame(refreshed_table_data)
-        grid.on('rowSelected', selected_row)
-        grid.row_data = data_div
-        grid.options.columnDefs[0].hide = True
-        grid.options.columnDefs[1].checkboxSelection = True
-
-        conn.close()
-
-    ref()
+    refresh_table('', '')
 
     refresh_table_button = jp.Button(text='Refresh', type='button', a=button_div3, classes=button_classes,
                                      click=refresh_table)
@@ -139,6 +120,6 @@ def delete_selected(self, msg):
     cur = conn.cursor()
     reim_del = reim_sel_data['ReimID']
     cur.execute(f"DELETE FROM Reimbursements WHERE ReimID = {reim_del}")
+    cur.execute(f"DELETE FROM Purchase WHERE ReimID = {reim_del}")
     conn.commit()
     conn.close()
-
