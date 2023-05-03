@@ -141,8 +141,8 @@ def reim_table():
         reim_val = reim_sel_data['ReimID']
         print(reim_val)
         pur_refreshed_table_data = pd.read_sql_query(
-            "SELECT PurchaseID, PurchaseDate AS 'Purchase Date', Amount, Content, "
-            "PurchaseType AS 'PurchaseType' FROM Purchase WHERE ReimID = {reim_val}", conn)
+            f"SELECT PurchaseID, PurchaseDate AS 'Purchase Date', Amount, Content, "
+            f"PurchaseType AS 'PurchaseType' FROM Purchase WHERE ReimID = {reim_val}", conn)
 
         grid_pur.load_pandas_frame(pur_refreshed_table_data)
         grid_pur.on('rowSelected', pur_selected_row)
