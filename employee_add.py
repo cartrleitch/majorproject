@@ -69,10 +69,18 @@ def add_emp_main():
     empaccount_label.for_component = empaccount_in
 
     # ministry dropdown menu input
+    conn = sqlite3.connect('db_reimbursements.db')
+    cur = conn.cursor()
+    cur.execute('SELECT MinistryID, Desc FROM Ministries')
+    min_data = cur.fetchall()
+    conn.close()
+    min_data_dict = {}
     ministry_label = jp.Label(a=input_div, text='Ministry', classes=label_classes)
-    ministries = ['childrens', 'womens']
-    select = jp.Select(a=input_div, value='childrens')
-    for ministry in ministries:
+
+    for data in min_data:
+        min_data_dict[data[1]] = data[0]
+    select = jp.Select(a=input_div)
+    for ministry in min_data_dict:
         select.add(jp.Option(value=ministry, text=ministry))
     ministry_label.for_component = select
 
@@ -99,67 +107,74 @@ def add_emp_main():
     done_button = jp.Button(text='Done', type='button', a=button_div2, classes=button_classes,
                             click=done_red)
 
+    # inserts values from entries into table
+    def submit_form(self, msg):
+        data = msg.form_data
+        first_name = ''
+        last_name = ''
+        street = ''
+        city = ''
+        state = ''
+        zip_code = ''
+        job_title = ''
+        emp_account = ''
+        minis = ''
+
+        # assigns variables values from entries
+        for output in data:
+            if output['placeholder'] == 'First Name':
+                first_name = output.value
+
+            if output['placeholder'] == 'Last Name':
+                last_name = output.value
+
+            if output['placeholder'] == 'Street':
+                street = output.value
+
+            if output['placeholder'] == 'City':
+                city = output.value
+
+            if output['placeholder'] == 'State':
+                state = output.value
+
+            if output['placeholder'] == 'Zip Code':
+                zip_code = output.value
+
+            if output['placeholder'] == 'Job Title':
+                job_title = output.value
+
+            if output['placeholder'] == 'Employee Account':
+                emp_account = output.value
+
+            if output['html_tag'] == 'select':
+                minis = output.value
+
+        conn = sqlite3.connect('db_reimbursements.db')
+        cur = conn.cursor()
+        cur.execute('INSERT INTO Employee(FirstName, LastName, Street, City, State, ZipCode, '
+                    'JobTitle, EmpAccount) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', (first_name, last_name, street, city,
+                                                                              state, zip_code, job_title,
+                                                                              emp_account))
+        cur.execute("SELECT MAX(EmpID) FROM Employee")
+        emp = cur.fetchone()
+        conn.commit()
+        conn.close()
+        conn = sqlite3.connect('db_reimbursements.db')
+        cur = conn.cursor()
+        cur.execute("INSERT INTO EmpMinistry (MinistryID, EmpID, StartDate, EndDate) VALUES "
+                    "(?, ?, '12-12-2023', '12-12-2023')",
+                    (min_data_dict[minis], emp[0]))
+        conn.commit()
+        conn.close()
+
     form1.on('submit', submit_form)
+
     # creates webpage
     return wp
 
 
 def done_red(self, msg):
     msg.page.redirect = 'http://127.0.0.1:8000/employeetable'
-
-
-# inserts values from entries into table
-def submit_form(self, msg):
-    data = msg.form_data
-    first_name = ''
-    last_name = ''
-    street = ''
-    city = ''
-    state = ''
-    zip_code = ''
-    job_title = ''
-    emp_account = ''
-    minis = ''
-
-    # assigns variables values from entries
-    for output in data:
-        if output['placeholder'] == 'First Name':
-            first_name = output.value
-
-        if output['placeholder'] == 'Last Name':
-            last_name = output.value
-
-        if output['placeholder'] == 'Street':
-            street = output.value
-
-        if output['placeholder'] == 'City':
-            city = output.value
-
-        if output['placeholder'] == 'State':
-            state = output.value
-
-        if output['placeholder'] == 'Zip Code':
-            zip_code = output.value
-
-        if output['placeholder'] == 'Job Title':
-            job_title = output.value
-
-        if output['placeholder'] == 'Employee Account':
-            emp_account = output.value
-
-        if output['id'] == '24':
-            minis = output.value
-
-    conn = sqlite3.connect('db_reimbursements.db')
-    cur = conn.cursor()
-    cur.execute('INSERT INTO Employee(FirstName, LastName, Street, City, State, ZipCode, '
-                'JobTitle, EmpAccount) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', (first_name, last_name, street, city,
-                                                                          state, zip_code, job_title,
-                                                                          emp_account))
-    # needs corresponding IDs and date to input
-    # cur.execute("INSERT INTO EmpMinistry (StartDate, EndDate) VALUES ('12-12-2023', '12-12-2023')")
-    conn.commit()
-    conn.close()
 
 
 if __name__ == '__main__':

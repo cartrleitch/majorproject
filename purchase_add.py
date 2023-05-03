@@ -3,6 +3,7 @@ import sys
 import justpy as jp
 from cosmetic_classes import *
 import time
+from main_reimbursements import *
 
 
 @jp.SetRoute('/addpurchase')
@@ -80,7 +81,7 @@ def add_purchase_main():
 
 
 def done_red(self, msg):
-    msg.page.redirect = 'http://127.0.0.1:8000/purchasetable'
+    msg.page.redirect = 'http://127.0.0.1:8000/reimbursementtable'
 
 
 # inserts values from entries into table
@@ -90,7 +91,6 @@ def submit_form(self, msg):
     total_cost = ''
     p_type = ''
     contents = ''
-    print(data)
     for output in data:
         if output['placeholder'] == 'Date':
             date = output.value
@@ -106,8 +106,11 @@ def submit_form(self, msg):
 
     conn = sqlite3.connect('db_reimbursements.db')
     cur = conn.cursor()
+    reim_val = reim_ret()
     cur.execute('INSERT INTO Purchase(PurchaseDate, Amount, Content, PurchaseType, ReimID) '
-                'VALUES (?, ?, ?, ?, 1)', (date, total_cost, p_type, contents))
+                'VALUES (?, ?, ?, ?, ?)', (date, total_cost, contents, p_type, reim_val))
+    cur.execute(f'UPDATE Reimbursements SET Total = (SELECT SUM(Amount) FROM Purchase WHERE ReimID = {reim_val}) '
+                f'WHERE ReimID = {reim_val}')
     conn.commit()
     conn.close()
 

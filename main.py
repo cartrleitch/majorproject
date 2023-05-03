@@ -8,10 +8,13 @@ from employee_add import *
 from main_reimbursements import *
 from purchase_table import *
 from employee_table import *
+from main_reimbursements import reim_sel_data
+import webbrowser
 
 
 def main():
     # create webpage (first page is reimbursement table)
+    webbrowser.open('http://127.0.0.1:8000')
     jp.justpy(reim_table)
 
 

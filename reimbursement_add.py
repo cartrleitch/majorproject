@@ -76,11 +76,6 @@ def add_reim_main():
     save_button.on('click', show_saved)
     save_button.on('mouseleave', hide_saved)
 
-    # return then call
-    # button for adding purchase
-    add_purchase_button = jp.Button(text='Add Purchase', type='button', a=button_div2, classes=button_classes,
-                                    click=add_purchase_red)
-
     # done button
     done_button = jp.Button(text='Done', type='button', a=button_div2, classes=button_classes,
                             click=done_red)
@@ -101,14 +96,9 @@ def add_reim_main():
         conn = sqlite3.connect('db_reimbursements.db')
         cur = conn.cursor()
 
-        # calculate total (maybe in purchase do update on ReimID with
-        # SUM(Amount) FROM Purchase where ReimID is the same)
-        cur.execute('SELECT SUM(Amount) FROM Purchase WHERE ReimID = 1')
-        total = cur.fetchone()
-
         # inserts value into reimbursements
-        cur.execute('INSERT INTO Reimbursements(EmpID, DateRec, Total) '
-                    'VALUES (?, ?, ?)', (emp_data_dict[emp], date, total[0]))
+        cur.execute('INSERT INTO Reimbursements(EmpID, DateRec) '
+                    'VALUES (?, ?)', (emp_data_dict[emp], date))
 
         conn.commit()
         conn.close()
@@ -117,11 +107,6 @@ def add_reim_main():
 
     # creates webpage
     return wp
-
-
-# add purchase function
-def add_purchase_red(self, msg):
-    msg.page.redirect = 'http://127.0.0.1:8000/addpurchase'
 
 
 def done_red(self, msg):

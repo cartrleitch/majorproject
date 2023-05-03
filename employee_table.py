@@ -69,6 +69,7 @@ def reim_table():
         cur.execute(f"DELETE FROM Employee WHERE EmpID = {emp_del}")
         conn.commit()
         conn.close()
+        refresh_table('', '')
 
     delete_button = jp.Button(text='Delete', type='button', a=button_div2, classes=button_classes,
                               click=delete_selected)
