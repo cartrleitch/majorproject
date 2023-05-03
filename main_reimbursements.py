@@ -102,15 +102,6 @@ def reim_table():
         conn = sqlite3.connect('db_reimbursements.db')
         cur = conn.cursor()
 
-        try:
-            reim_val = reim_sel_data['ReimID']
-            cur.execute(f"UPDATE Reimbursements SET Total = (SELECT SUM(Amount) FROM Purchase "
-                        f"WHERE ReimID = ?)"
-                        f"WHERE ReimID = ?", (reim_val, reim_val))
-
-        except TypeError:
-            print('Not a dictionary')
-
         # gets data from query to show employee and reimbursement information
         refreshed_table_data = pd.read_sql_query("SELECT Reimbursements.ReimID, Employee.FirstName AS 'First Name', "
                                                  "Employee.LastName AS 'Last Name', "
@@ -142,13 +133,16 @@ def reim_table():
     refresh_table('', '')
 
     def ref_sel(self, msg):
+        print('hi')
         conn = sqlite3.connect('db_reimbursements.db')
         cur = conn.cursor()
 
         # gets data from query to show employee and reimbursement information
+        reim_val = reim_sel_data['ReimID']
+        print(reim_val)
         pur_refreshed_table_data = pd.read_sql_query(
             "SELECT PurchaseID, PurchaseDate AS 'Purchase Date', Amount, Content, "
-            "PurchaseType AS 'PurchaseType' FROM Purchase WHERE ReimID = {reim_sel_data['ReimID']}", conn)
+            "PurchaseType AS 'PurchaseType' FROM Purchase WHERE ReimID = {reim_val}", conn)
 
         grid_pur.load_pandas_frame(pur_refreshed_table_data)
         grid_pur.on('rowSelected', pur_selected_row)
