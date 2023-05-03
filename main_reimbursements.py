@@ -56,7 +56,7 @@ def reim_table():
             reim_sel_data = self.row_data.text
             self.row_selected = msg.rowIndex
             reim_ret()
-            refresh_table('', '')
+            ref_sel('', '')
         elif self.row_selected == msg.rowIndex:
             self.row_data.text = ''
 
@@ -141,6 +141,24 @@ def reim_table():
 
     refresh_table('', '')
 
+    def ref_sel(self, msg):
+        conn = sqlite3.connect('db_reimbursements.db')
+        cur = conn.cursor()
+
+        # gets data from query to show employee and reimbursement information
+        pur_refreshed_table_data = pd.read_sql_query(
+            "SELECT PurchaseID, PurchaseDate AS 'Purchase Date', Amount, Content, "
+            "PurchaseType AS 'PurchaseType' FROM Purchase WHERE ReimID = {reim_sel_data['ReimID']}", conn)
+
+        grid_pur.load_pandas_frame(pur_refreshed_table_data)
+        grid_pur.on('rowSelected', pur_selected_row)
+        grid_pur.row_data = data_div
+        grid_pur.options.columnDefs[0].hide = True
+        grid_pur.options.columnDefs[1].checkboxSelection = True
+
+        conn.commit()
+        conn.close()
+
     def delete_selected(self, msg):
         if reim_sel_data != '':
             conn = sqlite3.connect('db_reimbursements.db')
@@ -192,6 +210,7 @@ def reim_table():
 
     pur_delete_selected_button = jp.Button(text='Delete Purchase', type='button', a=button_div3, classes=button_classes,
                                            click=pur_delete_selected)
+
     pur_paid_button = jp.Button(text='Mark Paid', type='button', a=button_div3, classes=button_classes, click=pur_paid)
 
 
