@@ -192,9 +192,8 @@ def reim_table():
 
     pur_delete_selected_button = jp.Button(text='Delete Purchase', type='button', a=button_div3, classes=button_classes,
                                            click=pur_delete_selected)
+    pur_paid_button = jp.Button(text='Mark Paid', type='button', a=button_div3, classes=button_classes, click=pur_paid)
 
-    #pur_paid_button = jp.Button(text='Mark Paid', type='button', a=button_div3, classes=button_classes,
-    #                            click=pur_paid)
 
     return wp
 
