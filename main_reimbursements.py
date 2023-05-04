@@ -8,6 +8,8 @@ global reim_sel_data
 reim_sel_data = ''
 global pur_sel_data
 pur_sel_data = ''
+global edit
+edit = ''
 
 conn = sqlite3.connect('db_reimbursements.db')
 
@@ -133,13 +135,13 @@ def reim_table():
     refresh_table('', '')
 
     def ref_sel(self, msg):
-        print('hi')
         conn = sqlite3.connect('db_reimbursements.db')
         cur = conn.cursor()
+        reim_val = reim_sel_data['ReimID']
+        cur.execute(f'UPDATE Reimbursements SET Total = (SELECT SUM(Amount) FROM Purchase WHERE ReimID = {reim_val}) '
+                    f'WHERE ReimID = {reim_val}')
 
         # gets data from query to show employee and reimbursement information
-        reim_val = reim_sel_data['ReimID']
-        print(reim_val)
         pur_refreshed_table_data = pd.read_sql_query(
             f"SELECT PurchaseID, PurchaseDate AS 'Purchase Date', Amount, Content, "
             f"PurchaseType AS 'PurchaseType' FROM Purchase WHERE ReimID = {reim_val}", conn)
@@ -169,7 +171,11 @@ def reim_table():
             conn = sqlite3.connect('db_reimbursements.db')
             cur = conn.cursor()
             pur_del = pur_sel_data['PurchaseID']
+            reim_val = reim_sel_data['ReimID']
             cur.execute(f"DELETE FROM Purchase WHERE PurchaseID = {pur_del}")
+            cur.execute(f'UPDATE Reimbursements SET Total = (SELECT SUM(Amount) FROM Purchase '
+                        f'WHERE ReimID = {reim_val})'
+                        f' WHERE ReimID = {reim_val}')
             conn.commit()
             conn.close()
             refresh_table('', '')
@@ -195,6 +201,9 @@ def reim_table():
     refresh_table_button = jp.Button(text='Refresh', type='button', a=button_div2, classes=button_classes,
                                      click=refresh_table)
 
+    reim_edit_button = jp.Button(text='Edit Reimb.', type='button', a=button_div2,
+                                 classes=button_classes, click=reim_edit)
+
     delete_selected_button = jp.Button(text='Delete Reimb.', type='button', a=button_div3, classes=button_classes,
                                        click=delete_selected)
 
@@ -207,6 +216,8 @@ def reim_table():
 
     pur_paid_button = jp.Button(text='Mark Paid', type='button', a=button_div3, classes=button_classes, click=pur_paid)
 
+    pur_edit_button = jp.Button(text='Edit Purchase', type='button', a=button_div3,
+                                classes=button_classes, click=pur_edit)
 
     return wp
 
@@ -227,3 +238,23 @@ def add_pur_red(self, msg):
 def reim_ret():
     reim_id = reim_sel_data['ReimID']
     return reim_id
+
+
+def set_edit():
+    global edit
+    edit = True
+    return edit
+
+
+def no_edit():
+    global edit
+    edit = False
+    return edit
+
+
+def pur_edit(self, msg):
+    set_edit()
+
+
+def reim_edit(self, msg):
+    set_edit()

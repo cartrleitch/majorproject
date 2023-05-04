@@ -82,6 +82,7 @@ def add_purchase_main():
 
 def done_red(self, msg):
     msg.page.redirect = 'http://127.0.0.1:8000/reimbursementtable'
+    no_edit()
 
 
 # inserts values from entries into table
@@ -113,6 +114,7 @@ def submit_form(self, msg):
                 f'WHERE ReimID = {reim_val}')
     conn.commit()
     conn.close()
+    no_edit()
 
 
 if __name__ == '__main__':

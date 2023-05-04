@@ -8,7 +8,6 @@ from employee_add import *
 from main_reimbursements import *
 from purchase_table import *
 from employee_table import *
-from main_reimbursements import reim_sel_data
 import webbrowser
 
 

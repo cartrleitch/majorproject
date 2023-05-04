@@ -3,6 +3,7 @@ import sys
 import justpy as jp
 from cosmetic_classes import *
 import time
+from main_reimbursements import *
 
 
 @jp.SetRoute('/addreimbursement')
@@ -97,11 +98,12 @@ def add_reim_main():
         cur = conn.cursor()
 
         # inserts value into reimbursements
-        cur.execute('INSERT INTO Reimbursements(EmpID, DateRec) '
-                    'VALUES (?, ?)', (emp_data_dict[emp], date))
+        cur.execute('INSERT INTO Reimbursements(EmpID, DateRec, Total) '
+                    'VALUES (?, ?, ?)', (emp_data_dict[emp], date, ' '))
 
         conn.commit()
         conn.close()
+        no_edit()
 
     form1.on('submit', submit_form)
 
@@ -111,6 +113,7 @@ def add_reim_main():
 
 def done_red(self, msg):
     msg.page.redirect = 'http://127.0.0.1:8000/reimbursementtable'
+    no_edit()
 
 
 if __name__ == '__main__':
