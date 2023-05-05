@@ -85,6 +85,7 @@ def reim_table():
             global pur_sel_data
             pur_sel_data = self.row_data.text
             self.row_selected = msg.rowIndex
+            pur_ret()
         elif self.row_selected == msg.rowIndex:
             self.row_data.text = ''
 
@@ -226,6 +227,14 @@ def add_reim_red(self, msg):
     msg.page.redirect = 'http://127.0.0.1:8000/addreimbursement'
 
 
+def pur_edit(self, msg):
+    msg.page.redirect = 'http://127.0.0.1:8000/editpurchase'
+
+
+def reim_edit(self, msg):
+    msg.page.redirect = 'http://127.0.0.1:8000/editreimbursement'
+
+
 def employees(self, msg):
     msg.page.redirect = 'http://127.0.0.1:8000/employeetable'
 
@@ -240,21 +249,6 @@ def reim_ret():
     return reim_id
 
 
-def set_edit():
-    global edit
-    edit = True
-    return edit
-
-
-def no_edit():
-    global edit
-    edit = False
-    return edit
-
-
-def pur_edit(self, msg):
-    set_edit()
-
-
-def reim_edit(self, msg):
-    set_edit()
+def pur_ret():
+    pur_id = pur_sel_data['PurchaseID']
+    return pur_id

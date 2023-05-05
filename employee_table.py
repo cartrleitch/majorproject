@@ -22,7 +22,7 @@ def selected_row(self, msg):
         global emp_sel_data
         emp_sel_data = self.row_data.text
         self.row_selected = msg.rowIndex
-        return self.row_data.text
+        emp_ret()
     elif self.row_selected == msg.rowIndex:
         self.row_data.text = ''
 
@@ -58,8 +58,8 @@ def reim_table():
     grid.options.columnDefs[1].checkboxSelection = True
 
     # button that adds employee
-    view_contents_button = jp.Button(text='Add', type='button', a=button_div2, classes=button_classes,
-                                     click=add_employee)
+    add_employee_button = jp.Button(text='Add', type='button', a=button_div2, classes=button_classes,
+                                    click=add_employee)
 
     # delete button
     def delete_selected(self, msg):
@@ -93,9 +93,21 @@ def reim_table():
 
     refresh_table_button = jp.Button(text='Refresh', type='button', a=button_div2, classes=button_classes,
                                      click=refresh_table)
+    edit_employee_button = jp.Button(text='Edit Employee', type='button', a=button_div2, classes=button_classes,
+                                     click=edit_employee)
 
     return wp
 
 
 def add_employee(self, msg):
     msg.page.redirect = 'http://127.0.0.1:8000/addemployee'
+
+
+def edit_employee(self, msg):
+    msg.page.redirect = 'http://127.0.0.1:8000/editemployee'
+
+
+def emp_ret():
+    emp_id = emp_sel_data['EmpID']
+    return emp_id
+

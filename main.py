@@ -6,8 +6,10 @@ from purchase_add import *
 from reimbursement_add import *
 from employee_add import *
 from main_reimbursements import *
-from purchase_table import *
 from employee_table import *
+from purchase_edit import *
+from employee_edit import *
+from reimbursement_edit import *
 import webbrowser
 
 

@@ -6,7 +6,7 @@ import time
 from main_reimbursements import *
 
 
-@jp.SetRoute('/addpurchase')
+@jp.SetRoute('/editpurchase')
 def add_purchase_main():
     # webpage creation
     wp = jp.WebPage(delete_flag=False)
@@ -17,9 +17,9 @@ def add_purchase_main():
                         click=banner_click)
     banner_sub = jp.Div(text='Reimbursement Manager', a=banner_div, classes=banner_sub_classes,
                         style='font-size:15px; padding-top: 10px;')
-    title_div = jp.Div(text='Purchase Add', a=wp,
+    title_div = jp.Div(text='Purchase Edit', a=wp,
                        classes=title_classes)
-    description_div = jp.Div(text='Create Purchase', a=title_div,
+    description_div = jp.Div(text='Edit Purchase Data', a=title_div,
                              classes=desc_classes)
 
     # page divs
@@ -107,8 +107,10 @@ def submit_form(self, msg):
     conn = sqlite3.connect('db_reimbursements.db')
     cur = conn.cursor()
     reim_val = reim_ret()
-    cur.execute('INSERT INTO Purchase(PurchaseDate, Amount, Content, PurchaseType, ReimID) '
-                'VALUES (?, ?, ?, ?, ?)', (date, total_cost, contents, p_type, reim_val))
+    pur_val = pur_ret()
+    cur.execute('UPDATE Purchase SET PurchaseDate = ?, Amount = ?, Content = ?, PurchaseType = ?, ReimID = ? '
+                'WHERE PurchaseID = ?'
+                , (date, total_cost, contents, p_type, reim_val, pur_val))
     cur.execute(f'UPDATE Reimbursements SET Total = (SELECT SUM(Amount) FROM Purchase WHERE ReimID = {reim_val}) '
                 f'WHERE ReimID = {reim_val}')
     conn.commit()

@@ -2,10 +2,11 @@ import sqlite3
 import sys
 import justpy as jp
 from cosmetic_classes import *
+from employee_table import *
 import time
 
 
-@jp.SetRoute('/addemployee')
+@jp.SetRoute('/editemployee')
 def add_emp_main():
     # webpage creation
     wp = jp.WebPage(delete_flag=False)
@@ -16,9 +17,9 @@ def add_emp_main():
                         click=banner_click)
     banner_sub = jp.Div(text='Reimbursement Manager', a=banner_div, classes=banner_sub_classes,
                         style='font-size:15px; padding-top: 10px;')
-    title_div = jp.Div(text='Employee Add', a=wp,
+    title_div = jp.Div(text='Employee Edit', a=wp,
                        classes=title_classes)
-    description_div = jp.Div(text='Create Employee', a=title_div,
+    description_div = jp.Div(text='Edit Employee Data', a=title_div,
                              classes=desc_classes)
 
     # page divs
@@ -151,19 +152,16 @@ def add_emp_main():
 
         conn = sqlite3.connect('db_reimbursements.db')
         cur = conn.cursor()
-        cur.execute('INSERT INTO Employee(FirstName, LastName, Street, City, State, ZipCode, '
-                    'JobTitle, EmpAccount) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', (first_name, last_name, street, city,
-                                                                              state, zip_code, job_title,
-                                                                              emp_account))
-        cur.execute("SELECT MAX(EmpID) FROM Employee")
-        emp = cur.fetchone()
+        emp_val = emp_ret()
+        cur.execute('UPDATE Employee SET FirstName = ?, LastName = ?, Street = ?, City = ?, State = ?, ZipCode = ?, '
+                    'JobTitle = ?, EmpAccount = ? WHERE EmpID = ?', (first_name, last_name, street, city,
+                                                     state, zip_code, job_title, emp_account, emp_val))
         conn.commit()
         conn.close()
         conn = sqlite3.connect('db_reimbursements.db')
         cur = conn.cursor()
-        cur.execute("INSERT INTO EmpMinistry (MinistryID, EmpID, StartDate, EndDate) VALUES "
-                    "(?, ?, '12-12-2023', '12-12-2023')",
-                    (min_data_dict[minis], emp[0]))
+        cur.execute("UPDATE EmpMinistry SET MinistryID = ? WHERE EmpID = ?",
+                    (min_data_dict[minis], emp_val))
         conn.commit()
         conn.close()
 

@@ -6,7 +6,7 @@ import time
 from main_reimbursements import *
 
 
-@jp.SetRoute('/addreimbursement')
+@jp.SetRoute('/editreimbursement')
 def add_reim_main():
     # webpage creation
     wp = jp.WebPage(delete_flag=False)
@@ -17,9 +17,9 @@ def add_reim_main():
                         click=banner_click)
     banner_sub = jp.Div(text='Reimbursement Manager', a=banner_div, classes=banner_sub_classes,
                         style='font-size:15px; padding-top: 10px;')
-    title_div = jp.Div(text='Reimbursement Add', a=wp,
+    title_div = jp.Div(text='Reimbursement Edit', a=wp,
                        classes=title_classes)
-    description_div = jp.Div(text='Create Reimbursement', a=title_div,
+    description_div = jp.Div(text='Edit Reimbursement Data', a=title_div,
                              classes=desc_classes)
 
     # page divs
@@ -96,10 +96,9 @@ def add_reim_main():
 
         conn = sqlite3.connect('db_reimbursements.db')
         cur = conn.cursor()
-
+        employ = emp_data_dict[emp]
         # inserts value into reimbursements
-        cur.execute('INSERT INTO Reimbursements(EmpID, DateRec, Total) '
-                    'VALUES (?, ?, ?)', (emp_data_dict[emp], date, ' '))
+        cur.execute('UPDATE Reimbursements SET EmpID = ?, DateRec = ? WHERE ReimID = ?', (employ, date, reim_ret()))
 
         conn.commit()
         conn.close()
