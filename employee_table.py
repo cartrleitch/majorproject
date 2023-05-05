@@ -4,12 +4,14 @@ import justpy as jp
 import pandas as pd
 from cosmetic_classes import *
 
+# variable to keep track of
+# selected employee between pages
 global emp_sel_data
 emp_sel_data = ''
 
 conn = sqlite3.connect('db_reimbursements.db')
 
-# gets data from query to show employee and reimbursement information
+# gets data from query to show employee information
 reim_table_data = pd.read_sql_query("SELECT EmpID, FirstName, LastName, Street, City, "
                                     "State, ZipCode, JobTitle, EmpAccount FROM Employee", conn)
 conn.close()
@@ -28,11 +30,12 @@ def selected_row(self, msg):
 
 
 @jp.SetRoute("/employeetable")
-def reim_table():
+def emp_table():
     # creates webpage and titles it
     wp = jp.WebPage()
     wp.title = 'Reimbursement Tables'
 
+    # create page banner
     banner_div = jp.Div(text='Five Oaks Church', a=wp, classes=banner_classes,
                         style=banner_style,
                         click=banner_click)
@@ -61,7 +64,7 @@ def reim_table():
     add_employee_button = jp.Button(text='Add', type='button', a=button_div2, classes=button_classes,
                                     click=add_employee)
 
-    # delete button
+    # deletes selected employee information
     def delete_selected(self, msg):
         conn = sqlite3.connect('db_reimbursements.db')
         cur = conn.cursor()
@@ -74,7 +77,7 @@ def reim_table():
     delete_button = jp.Button(text='Delete', type='button', a=button_div2, classes=button_classes,
                               click=delete_selected)
 
-    # button
+    # refreshes employee table information
     def refresh_table(self, msg):
         conn = sqlite3.connect('db_reimbursements.db')
 
@@ -89,25 +92,32 @@ def reim_table():
 
         conn.close()
 
+    # refreshes table on page load
     refresh_table('', '')
 
+    # button for refreshing employee table information
     refresh_table_button = jp.Button(text='Refresh', type='button', a=button_div2, classes=button_classes,
                                      click=refresh_table)
+
+    # button for editing employee values
     edit_employee_button = jp.Button(text='Edit Employee', type='button', a=button_div2, classes=button_classes,
                                      click=edit_employee)
 
     return wp
 
 
+# redirects to add employee page
 def add_employee(self, msg):
     msg.page.redirect = 'http://127.0.0.1:8000/addemployee'
 
 
+# redirects to edit employee page
 def edit_employee(self, msg):
     msg.page.redirect = 'http://127.0.0.1:8000/editemployee'
 
 
+# sets emp_id to selected employee
+# EmpID and returns emp_id when called
 def emp_ret():
     emp_id = emp_sel_data['EmpID']
     return emp_id
-

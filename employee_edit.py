@@ -7,19 +7,20 @@ import time
 
 
 @jp.SetRoute('/editemployee')
-def add_emp_main():
-    # webpage creation
+def edit_emp_main():
+    # create and title webpage
     wp = jp.WebPage(delete_flag=False)
     wp.title = 'Add Employee'
 
+    # create page banner
     banner_div = jp.Div(text='Five Oaks Church', a=wp, classes=banner_classes,
                         style=banner_style,
                         click=banner_click)
     banner_sub = jp.Div(text='Reimbursement Manager', a=banner_div, classes=banner_sub_classes,
                         style='font-size:15px; padding-top: 10px;')
-    title_div = jp.Div(text='Employee Edit', a=wp,
+    title_div = jp.Div(text='Employee Add', a=wp,
                        classes=title_classes)
-    description_div = jp.Div(text='Edit Employee Data', a=title_div,
+    description_div = jp.Div(text='Create Employee', a=title_div,
                              classes=desc_classes)
 
     # page divs
@@ -93,18 +94,10 @@ def add_emp_main():
     saved_div.visibility_state = 'invisible'
     save_button.saved_div = saved_div
 
-    def show_saved(self, msg):
-        self.saved_div.set_class('visible')
-        self.saved_div.visibility_state = 'visible'
-
-    def hide_saved(self, msg):
-        time.sleep(1)
-        self.saved_div.set_class('invisible')
-        self.saved_div.visibility_state = 'invisible'
-
     save_button.on('click', show_saved)
     save_button.on('mouseleave', hide_saved)
 
+    # returns to employee table page
     done_button = jp.Button(text='Done', type='button', a=button_div2, classes=button_classes,
                             click=done_red)
 
@@ -153,13 +146,15 @@ def add_emp_main():
         conn = sqlite3.connect('db_reimbursements.db')
         cur = conn.cursor()
         emp_val = emp_ret()
+        # update selected employee values
         cur.execute('UPDATE Employee SET FirstName = ?, LastName = ?, Street = ?, City = ?, State = ?, ZipCode = ?, '
                     'JobTitle = ?, EmpAccount = ? WHERE EmpID = ?', (first_name, last_name, street, city,
-                                                     state, zip_code, job_title, emp_account, emp_val))
+                                                                     state, zip_code, job_title, emp_account, emp_val))
         conn.commit()
         conn.close()
         conn = sqlite3.connect('db_reimbursements.db')
         cur = conn.cursor()
+        # update ministry idea for selected employee
         cur.execute("UPDATE EmpMinistry SET MinistryID = ? WHERE EmpID = ?",
                     (min_data_dict[minis], emp_val))
         conn.commit()
@@ -171,9 +166,10 @@ def add_emp_main():
     return wp
 
 
+# redirects to employee table page
 def done_red(self, msg):
     msg.page.redirect = 'http://127.0.0.1:8000/employeetable'
 
 
 if __name__ == '__main__':
-    add_emp_main()
+    edit_emp_main()

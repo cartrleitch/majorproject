@@ -3,23 +3,24 @@ import sys
 import justpy as jp
 from cosmetic_classes import *
 import time
-from main_reimbursements import *
+from main_reim_pur import *
 
 
 @jp.SetRoute('/editreimbursement')
-def add_reim_main():
-    # webpage creation
+def edit_reim_main():
+    # create and title webpage
     wp = jp.WebPage(delete_flag=False)
     wp.title = 'Add Reimbursement'
 
+    # creates page banner
     banner_div = jp.Div(text='Five Oaks Church', a=wp, classes=banner_classes,
                         style=banner_style,
                         click=banner_click)
     banner_sub = jp.Div(text='Reimbursement Manager', a=banner_div, classes=banner_sub_classes,
                         style='font-size:15px; padding-top: 10px;')
-    title_div = jp.Div(text='Reimbursement Edit', a=wp,
+    title_div = jp.Div(text='Reimbursement Add', a=wp,
                        classes=title_classes)
-    description_div = jp.Div(text='Edit Reimbursement Data', a=title_div,
+    description_div = jp.Div(text='Create Reimbursement', a=title_div,
                              classes=desc_classes)
 
     # page divs
@@ -29,13 +30,10 @@ def add_reim_main():
     button_div = jp.Div(a=form1, classes='flex flex-col items-center py-3')
     button_div2 = jp.Div(a=button_div, classes='flex flex-row items-center py-3 overflow-hidden')
 
-    # purchase type dropdown menu input
+    # label for employee dropdown menu
     employee_label = jp.Label(a=input_div, text='Employees', classes=label_classes)
 
-    # get list a concatenation of first and last name from a select from Employee
-    # make a dictionary where the keys are
-    # employee full names and values are
-    # employee IDs
+    # get employees from database
     conn = sqlite3.connect('db_reimbursements.db')
     cur = conn.cursor()
     cur.execute('SELECT FirstName, LastName, EmpID FROM Employee')
@@ -43,6 +41,8 @@ def add_reim_main():
     conn.close()
     emp_data_dict = {}
 
+    # populate dropdown with employee full names
+    # store corresponding EmpID in dictionary
     for data in emp_data:
         emp_data_dict[f'{data[0]} {data[1]}'] = data[2]
 
@@ -64,20 +64,10 @@ def add_reim_main():
     saved_div.visibility_state = 'invisible'
     save_button.saved_div = saved_div
 
-
-    def show_saved(self, msg):
-        self.saved_div.set_class('visible')
-        self.saved_div.visibility_state = 'visible'
-
-    def hide_saved(self, msg):
-        time.sleep(1)
-        self.saved_div.set_class('invisible')
-        self.saved_div.visibility_state = 'invisible'
-
     save_button.on('click', show_saved)
     save_button.on('mouseleave', hide_saved)
 
-    # done button
+    # button returns to main page
     done_button = jp.Button(text='Done', type='button', a=button_div2, classes=button_classes,
                             click=done_red)
 
@@ -88,7 +78,6 @@ def add_reim_main():
         date = ''
         for output in data:
             if output['html_tag'] == 'select':
-                # translate emp from input into corresponding employee ID
                 emp = output.value
 
             if output['placeholder'] == 'Date':
@@ -97,7 +86,7 @@ def add_reim_main():
         conn = sqlite3.connect('db_reimbursements.db')
         cur = conn.cursor()
         employ = emp_data_dict[emp]
-        # inserts value into reimbursements
+        # updates values for selected reimbursement
         cur.execute('UPDATE Reimbursements SET EmpID = ?, DateRec = ? WHERE ReimID = ?', (employ, date, reim_ret()))
 
         conn.commit()
@@ -109,9 +98,10 @@ def add_reim_main():
     return wp
 
 
+# redirects to main page
 def done_red(self, msg):
     msg.page.redirect = 'http://127.0.0.1:8000/reimbursementtable'
 
 
 if __name__ == '__main__':
-    add_reim_main()
+    edit_reim_main()
