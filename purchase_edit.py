@@ -42,7 +42,6 @@ def edit_purchase_main():
 
     # purchase type dropdown menu input
     purchaseType_label = jp.Label(a=input_div, text='Purchase Type', classes=label_classes)
-    purchase_types = ['once', 'many']
     select = jp.Select(a=input_div, value='once')
     for pur_type in purchase_types:
         select.add(jp.Option(value=pur_type, text=pur_type))

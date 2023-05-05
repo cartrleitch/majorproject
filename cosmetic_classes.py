@@ -31,3 +31,7 @@ def hide_saved(self, msg):
     time.sleep(1)
     self.saved_div.set_class('invisible')
     self.saved_div.visibility_state = 'invisible'
+
+
+# list of purchase types
+purchase_types = ['Event', 'Snacks', 'Decorations']

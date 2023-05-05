@@ -150,8 +150,15 @@ def reim_table():
         cur = conn.cursor()
         reim_val = reim_sel_data['ReimID']
         # updates reimbursement total
-        cur.execute(f'UPDATE Reimbursements SET Total = (SELECT SUM(Amount) FROM Purchase WHERE ReimID = {reim_val}) '
-                    f'WHERE ReimID = {reim_val}')
+        tot = 0
+        cur.execute(f'SELECT SUM(Amount) FROM Purchase WHERE ReimID = {reim_val}')
+        ret_val = cur.fetchone()
+        if ret_val[0] is not None:
+            cur.execute(f'SELECT SUM(Amount) FROM Purchase WHERE ReimID = {reim_val}')
+            tot_val = cur.fetchone()
+            tot = tot_val[0]
+
+        cur.execute(f'UPDATE Reimbursements SET Total = {tot} WHERE ReimID = {reim_val}')
 
         # gets data from query to show purchase information
         pur_refreshed_table_data = pd.read_sql_query(
@@ -188,9 +195,15 @@ def reim_table():
             pur_del = pur_sel_data['PurchaseID']
             reim_val = reim_sel_data['ReimID']
             cur.execute(f"DELETE FROM Purchase WHERE PurchaseID = {pur_del}")
-            cur.execute(f'UPDATE Reimbursements SET Total = (SELECT SUM(Amount) FROM Purchase '
-                        f'WHERE ReimID = {reim_val})'
-                        f' WHERE ReimID = {reim_val}')
+            cur.execute(f'SELECT SUM(Amount) FROM Purchase WHERE ReimID = {reim_val}')
+            tot = 0
+            ret_val = cur.fetchone()
+            if ret_val[0] is not None:
+                cur.execute(f'SELECT SUM(Amount) FROM Purchase WHERE ReimID = {reim_val}')
+                tot_val = cur.fetchone()
+                tot = tot_val[0]
+
+            cur.execute(f'UPDATE Reimbursements SET Total = {tot} WHERE ReimID = {reim_val}')
             conn.commit()
             conn.close()
             refresh_table('', '')
@@ -223,7 +236,7 @@ def reim_table():
                                  classes=button_classes, click=reim_edit)
 
     # button that deletes selected reimbursement
-    reim_delete_selected_button = jp.Button(text='Delete Reimb.', type='button', a=button_div3, classes=button_classes,
+    reim_delete_selected_button = jp.Button(text='Delete Reimb.', type='button', a=button_div2, classes=button_classes,
                                             click=reim_delete_selected)
 
     # button that opens add purchase page
@@ -252,12 +265,14 @@ def add_reim_red(self, msg):
 
 # redirect to edit purchase page
 def pur_edit(self, msg):
-    msg.page.redirect = 'http://127.0.0.1:8000/editpurchase'
+    if pur_sel_data != '':
+        msg.page.redirect = 'http://127.0.0.1:8000/editpurchase'
 
 
 # redirect to edit reimbursement page
 def reim_edit(self, msg):
-    msg.page.redirect = 'http://127.0.0.1:8000/editreimbursement'
+    if reim_sel_data != '':
+        msg.page.redirect = 'http://127.0.0.1:8000/editreimbursement'
 
 
 # redirect to employee table page
