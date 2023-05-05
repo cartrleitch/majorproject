@@ -12,8 +12,8 @@ emp_sel_data = ''
 conn = sqlite3.connect('db_reimbursements.db')
 
 # gets data from query to show employee information
-reim_table_data = pd.read_sql_query("SELECT EmpID, FirstName, LastName, Street, City, "
-                                    "State, ZipCode, JobTitle, EmpAccount FROM Employee", conn)
+emp_table_data = pd.read_sql_query("SELECT EmpID, FirstName, LastName, Street, City, "
+                                   "State, ZipCode, JobTitle, EmpAccount FROM Employee", conn)
 conn.close()
 
 
@@ -53,8 +53,8 @@ def emp_table():
     table_label.for_component = table_div
 
     # creates table
-    grid = reim_table_data.jp.ag_grid(a=table_div, style="height: 50vh; width: 60vw; margin: "
-                                                         "0.25rem; padding: 0.25rem;")
+    grid = emp_table_data.jp.ag_grid(a=table_div, style="height: 50vh; width: 60vw; max-width: 1000px; margin: "
+                                                        "0.25rem; padding: 0.25rem;")
     grid.on('rowSelected', selected_row)
     grid.row_data = data_div
     grid.options.columnDefs[0].hide = True

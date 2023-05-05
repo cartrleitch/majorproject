@@ -66,7 +66,8 @@ def reim_table():
 
     # creates reimbursement table
     grid_reim = reim_table_data.jp.ag_grid(a=table_div,
-                                           style="height: 50vh; width: 50vw; margin: 0.25rem; padding: 0.25rem;")
+                                           style="height: 50vh; width: 50vw; max-width: 675px;"
+                                                 " margin: 0.25rem; padding: 0.25rem;")
     grid_reim.row_data = data_div
     grid_reim.on('rowSelected', reim_selected_row)
     grid_reim.options.columnDefs[0].hide = True
@@ -96,7 +97,8 @@ def reim_table():
 
     # creates purchase table
     grid_pur = pur_table_data.jp.ag_grid(a=table_div2,
-                                         style="height: 50vh; width: 40vw; margin: 0.25rem; padding: 0.25rem;")
+                                         style="height: 50vh; width: 40vw; max-width: 575px; "
+                                               "margin: 0.25rem; padding: 0.25rem;")
     grid_pur.row_data = data_div2
     grid_pur.on('rowSelected', reim_selected_row)
     grid_pur.options.columnDefs[0].hide = True
