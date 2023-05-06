@@ -70,6 +70,9 @@ def emp_table():
         cur = conn.cursor()
         emp_del = emp_sel_data['EmpID']
         cur.execute(f"DELETE FROM Employee WHERE EmpID = {emp_del}")
+        cur.execute(f'DELETE FROM Purchase WHERE ReimID = (SELECT ReimID FROM Employee WHERE EmpID = {emp_del})')
+        cur.execute(f'DELETE FROM Reimbursements WHERE EmpID = {emp_del}')
+        cur.execute(f'DELETE FROM EmpMinistry WHERE EmpID = {emp_del}')
         conn.commit()
         conn.close()
         refresh_table('', '')
