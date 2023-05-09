@@ -12,8 +12,11 @@ emp_sel_data = ''
 conn = sqlite3.connect('db_reimbursements.db')
 
 # gets data from query to show employee information
-emp_table_data = pd.read_sql_query("SELECT EmpID, FirstName, LastName, Street, City, "
-                                   "State, ZipCode, JobTitle, EmpAccount FROM Employee", conn)
+emp_table_data = pd.read_sql_query("SELECT Employee.EmpID, Employee.FirstName, Employee.LastName, Employee.Street, "
+                                   "Employee.City, Employee.State, Employee.ZipCode, Employee.JobTitle, "
+                                   "Employee.EmpAccount, Ministries.Desc FROM Employee INNER JOIN Ministries "
+                                   "ON Employee.EmpID IN (SELECT EmpID FROM EmpMinistry "
+                                   "WHERE EmpMinistry.MinistryID = Ministries.MinistryID);", conn)
 conn.close()
 
 
@@ -73,7 +76,6 @@ def emp_table():
         cur.execute(f'DELETE FROM Purchase WHERE ReimID IN (SELECT ReimID FROM Reimbursements WHERE EmpID = {emp_del})')
         cur.execute(f'DELETE FROM Reimbursements WHERE EmpID = {emp_del}')
         cur.execute(f'DELETE FROM EmpMinistry WHERE EmpID = {emp_del}')
-        print('ho')
         conn.commit()
         conn.close()
         refresh_table('', '')
@@ -86,8 +88,13 @@ def emp_table():
         conn = sqlite3.connect('db_reimbursements.db')
 
         # gets data from query to show employee and reimbursement information
-        refreshed_table_data = pd.read_sql_query("SELECT EmpID, FirstName, LastName, Street, City, "
-                                                 "State, ZipCode, JobTitle, EmpAccount FROM Employee", conn)
+        refreshed_table_data = pd.read_sql_query("SELECT Employee.EmpID, Employee.FirstName, Employee.LastName, "
+                                                 "Employee.Street, "
+                                                 "Employee.City, Employee.State, Employee.ZipCode, Employee.JobTitle, "
+                                                 "Employee.EmpAccount, Ministries.Desc FROM Employee "
+                                                 "INNER JOIN Ministries "
+                                                 "ON Employee.EmpID IN (SELECT EmpID FROM EmpMinistry "
+                                                 "WHERE EmpMinistry.MinistryID = Ministries.MinistryID);", conn)
         grid.load_pandas_frame(refreshed_table_data)
         grid.on('rowSelected', selected_row)
         grid.row_data = data_div

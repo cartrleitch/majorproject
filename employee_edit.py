@@ -30,44 +30,68 @@ def edit_emp_main():
     button_div = jp.Div(a=form1, classes='flex flex-col items-center py-3')
     button_div2 = jp.Div(a=button_div, classes='flex flex-row items-center py-3')
 
+    conn = sqlite3.connect('db_reimbursements.db')
+    cur = conn.cursor()
+    emp_id = emp_ret()
+    # update selected employee values
+    cur.execute(f"SELECT EmpID, FirstName, LastName, Street, City, State, "
+                f"ZipCode, JobTitle, EmpAccount FROM Employee WHERE EmpID = {emp_id}")
+    selected_emp = cur.fetchone()
+    cur.execute(f"SELECT MinistryID, Desc FROM Ministries WHERE MinistryID = (SELECT MinistryID FROM "
+                f"EmpMinistry WHERE EmpID = {emp_id});")
+    selected_emp_min = cur.fetchone()
+    conn.commit()
+    conn.close()
+    print(selected_emp)
+
+    fname_val = selected_emp[1]
+    lname_val = selected_emp[2]
+    street_val = selected_emp[3]
+    city_val = selected_emp[4]
+    state_val = selected_emp[5]
+    zipcode_val = selected_emp[6]
+    jobtitle_val = selected_emp[7]
+    account_val = selected_emp[8]
+    min_val = selected_emp_min[1]
+
     # first name entry
     fname_label = jp.Label(a=input_div, text='First Name', classes=label_classes)
-    fname_in = jp.Input(a=input_div, placeholder='First Name', classes=input_classes, type='text')
+    fname_in = jp.Input(a=input_div, placeholder='First Name', value=fname_val, classes=input_classes, type='text')
     fname_label.for_component = fname_in
 
     # last name entry
     lname_label = jp.Label(a=input_div, text='Last Name', classes=label_classes)
-    lname_in = jp.Input(a=input_div, placeholder='Last Name', classes=input_classes, type='text')
+    lname_in = jp.Input(a=input_div, placeholder='Last Name', value=lname_val, classes=input_classes, type='text')
     lname_label.for_component = lname_in
 
     # street entry
     street_label = jp.Label(a=input_div, text='Street', classes=label_classes)
-    street_in = jp.Input(a=input_div, placeholder='Street', classes=input_classes, type='text')
+    street_in = jp.Input(a=input_div, placeholder='Street', value=street_val, classes=input_classes, type='text')
     street_label.for_component = street_in
 
     # city entry
     city_label = jp.Label(a=input_div, text='City', classes=label_classes)
-    city_in = jp.Input(a=input_div, placeholder='City', classes=input_classes, type='text')
+    city_in = jp.Input(a=input_div, placeholder='City', value=city_val, classes=input_classes, type='text')
     city_label.for_component = city_in
 
     # state entry
     state_label = jp.Label(a=input_div, text='State', classes=label_classes)
-    state_in = jp.Input(a=input_div, placeholder='State', classes=input_classes, type='text')
+    state_in = jp.Input(a=input_div, placeholder='State', value=state_val, classes=input_classes, type='text')
     state_label.for_component = state_in
 
     # zip code entry
     zipcode_label = jp.Label(a=input_div, text='Zip Code', classes=label_classes)
-    zipcode_in = jp.Input(a=input_div, placeholder='Zip Code', classes=input_classes, type='text')
+    zipcode_in = jp.Input(a=input_div, placeholder='Zip Code', value=zipcode_val, classes=input_classes, type='text')
     zipcode_label.for_component = zipcode_in
 
     # job title entry
     jobtitle_label = jp.Label(a=input_div, text='Job Title', classes=label_classes)
-    jobtitle_in = jp.Input(a=input_div, placeholder='Job Title', classes=input_classes, type='text')
+    jobtitle_in = jp.Input(a=input_div, placeholder='Job Title', value=jobtitle_val, classes=input_classes, type='text')
     jobtitle_label.for_component = jobtitle_in
 
     # employee account entry
     empaccount_label = jp.Label(a=input_div, text='Employee Account', classes=label_classes)
-    empaccount_in = jp.Input(a=input_div, placeholder='Employee Account', classes=input_classes, type='text')
+    empaccount_in = jp.Input(a=input_div, placeholder='Employee Account', value=account_val, classes=input_classes, type='text')
     empaccount_label.for_component = empaccount_in
 
     # ministry dropdown menu input
@@ -81,9 +105,11 @@ def edit_emp_main():
 
     for data in min_data:
         min_data_dict[data[1]] = data[0]
-    select = jp.Select(a=input_div)
+    select = jp.Select(a=input_div, value=min_val)
     for ministry in min_data_dict:
         select.add(jp.Option(value=ministry, text=ministry))
+
+
     ministry_label.for_component = select
 
     # button that calls submit_form when pressed

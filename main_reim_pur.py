@@ -18,7 +18,8 @@ conn = sqlite3.connect('db_reimbursements.db')
 reim_table_data = pd.read_sql_query("SELECT Reimbursements.ReimID, Employee.FirstName AS 'First Name', "
                                     "Employee.LastName AS 'Last Name', "
                                     "Reimbursements.DatePaid, "
-                                    "Reimbursements.DateRec AS 'Date Received', Reimbursements.Total FROM Employee "
+                                    "Reimbursements.DateRec AS 'Date Received', '$'||Reimbursements.Total AS Total "
+                                    "FROM Employee "
                                     "INNER JOIN Reimbursements ON "
                                     "Employee.EmpID = Reimbursements.EmpID;", conn)
 conn.close()
@@ -76,8 +77,8 @@ def reim_table():
     conn = sqlite3.connect('db_reimbursements.db')
 
     # gets data from query to show purchase information
-    pur_table_data = pd.read_sql_query("SELECT PurchaseID, PurchaseDate AS 'Purchase Date', Amount, Content, "
-                                       "PurchaseType AS 'PurchaseType' FROM Purchase", conn)
+    pur_table_data = pd.read_sql_query("SELECT PurchaseID, PurchaseDate AS 'Purchase Date', '$'||Amount AS Amount, "
+                                       "Content, PurchaseType AS 'PurchaseType' FROM Purchase", conn)
     conn.close()
 
     # takes data from selected purchase row
@@ -114,8 +115,8 @@ def reim_table():
         refreshed_table_data = pd.read_sql_query("SELECT Reimbursements.ReimID, Employee.FirstName AS 'First Name', "
                                                  "Employee.LastName AS 'Last Name', "
                                                  "Reimbursements.DatePaid, "
-                                                 "Reimbursements.DateRec AS 'Date Received', Reimbursements.Total FROM "
-                                                 "Employee "
+                                                 "Reimbursements.DateRec AS 'Date Received', '$'|| Reimbursements.Total "
+                                                 "AS Total FROM Employee "
                                                  "INNER JOIN Reimbursements ON "
                                                  "Employee.EmpID = Reimbursements.EmpID;", conn)
         # updates displayed reimbursement information
@@ -127,7 +128,7 @@ def reim_table():
 
         # gets data from query to show purchase information
         pur_refreshed_table_data = pd.read_sql_query(
-            "SELECT PurchaseID, PurchaseDate AS 'Purchase Date', Amount, Content, "
+            "SELECT PurchaseID, PurchaseDate AS 'Purchase Date', '$'|| Amount AS Amount, Content, "
             "PurchaseType AS 'PurchaseType' FROM Purchase", conn)
 
         # updates displayed purchase information
@@ -164,7 +165,7 @@ def reim_table():
 
         # gets data from query to show purchase information
         pur_refreshed_table_data = pd.read_sql_query(
-            f"SELECT PurchaseID, PurchaseDate AS 'Purchase Date', Amount, Content, "
+            f"SELECT PurchaseID, PurchaseDate AS 'Purchase Date', '$'|| Amount AS Amount, Content, "
             f"PurchaseType AS 'PurchaseType' FROM Purchase WHERE ReimID = {reim_val}", conn)
 
         # updates dispalyed purchase information
