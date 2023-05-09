@@ -33,6 +33,21 @@ def edit_reim_main():
     # label for employee dropdown menu
     employee_label = jp.Label(a=input_div, text='Employees', classes=label_classes)
 
+    sel_reim = reim_ret()
+    conn = sqlite3.connect('db_reimbursements.db')
+    cur = conn.cursor()
+    cur.execute(f"SELECT Reimbursements.ReimID, Employee.FirstName AS 'First Name', "
+                f"Employee.LastName AS 'Last Name', "
+                f"Reimbursements.DateRec AS 'Date Received' "
+                f"FROM Employee "
+                f"INNER JOIN Reimbursements ON "
+                f"Employee.EmpID = Reimbursements.EmpID WHERE Reimbursements.ReimID = {sel_reim};")
+    selected_reim = cur.fetchone()
+    conn.close()
+
+    name_val = f'{selected_reim[1]} {selected_reim[2]}'
+    date_val = selected_reim[3]
+
     # get employees from database
     conn = sqlite3.connect('db_reimbursements.db')
     cur = conn.cursor()
@@ -43,17 +58,18 @@ def edit_reim_main():
 
     # populate dropdown with employee full names
     # store corresponding EmpID in dictionary
+
     for data in emp_data:
         emp_data_dict[f'{data[0]} {data[1]}'] = data[2]
 
-    select = jp.Select(a=input_div)
+    select = jp.Select(a=input_div, value=name_val)
     for employee in emp_data_dict:
         select.add(jp.Option(value=employee, text=employee))
     employee_label.for_component = select
 
     # date entry
     date_label = jp.Label(a=input_div, text='Reimbursement Date', classes=label_classes)
-    date_in = jp.Input(a=input_div, placeholder='Date', classes=input_classes, type='date')
+    date_in = jp.Input(a=input_div, placeholder='Date', value=date_val, classes=input_classes, type='date')
     date_label.for_component = date_in
 
     # button that calls submit_form and puts saved message when pressed

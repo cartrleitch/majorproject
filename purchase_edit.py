@@ -30,26 +30,39 @@ def edit_purchase_main():
     button_div = jp.Div(a=form1, classes='flex flex-col items-center py-3')
     button_div2 = jp.Div(a=button_div, classes='flex flex-row items-center py-3')
 
+    sel_pur = pur_ret()
+    conn = sqlite3.connect('db_reimbursements.db')
+    cur = conn.cursor()
+    cur.execute(f"SELECT PurchaseID, PurchaseDate AS 'Purchase Date', Amount AS Amount, "
+                f"Content, PurchaseType AS 'PurchaseType' FROM Purchase WHERE PurchaseID = {sel_pur}")
+    selected_pur = cur.fetchone()
+    conn.close()
+
+    date_val = selected_pur[1]
+    amount_val = selected_pur[2]
+    contents_val = selected_pur[3]
+    type_val = selected_pur[4]
+
     # date entry
     date_label = jp.Label(a=input_div, text='Date', classes=label_classes)
-    date_in = jp.Input(a=input_div, placeholder='Date', classes=input_classes, type='date')
+    date_in = jp.Input(a=input_div, placeholder='Date', value=date_val, classes=input_classes, type='date')
     date_label.for_component = date_in
 
     # total cost entry
     cost_label = jp.Label(a=input_div, text='Total Cost', classes=label_classes)
-    cost_in = jp.Input(a=input_div, placeholder='Total Cost', classes=input_classes, type='text')
+    cost_in = jp.Input(a=input_div, placeholder='Total Cost',value=amount_val,  classes=input_classes, type='text')
     cost_label.for_component = cost_in
 
     # purchase type dropdown menu input
     purchaseType_label = jp.Label(a=input_div, text='Purchase Type', classes=label_classes)
-    select = jp.Select(a=input_div, value='once')
+    select = jp.Select(a=input_div, value=type_val)
     for pur_type in purchase_types:
         select.add(jp.Option(value=pur_type, text=pur_type))
     purchaseType_label.for_component = select
 
     # contents entry
     contents_label = jp.Label(a=input_div, text='Contents', classes=label_classes)
-    contents_in = jp.Textarea(a=input_div, placeholder='Contents', classes='form-input', type='text')
+    contents_in = jp.Textarea(a=input_div, placeholder='Contents', value=contents_val, classes='form-input', type='text')
     contents_label.for_component = contents_in
 
     # button that calls submit_form when pressed

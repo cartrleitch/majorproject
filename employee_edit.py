@@ -40,9 +40,7 @@ def edit_emp_main():
     cur.execute(f"SELECT MinistryID, Desc FROM Ministries WHERE MinistryID = (SELECT MinistryID FROM "
                 f"EmpMinistry WHERE EmpID = {emp_id});")
     selected_emp_min = cur.fetchone()
-    conn.commit()
     conn.close()
-    print(selected_emp)
 
     fname_val = selected_emp[1]
     lname_val = selected_emp[2]
